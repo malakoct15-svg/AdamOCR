@@ -1,8 +1,3 @@
-#GH WRITE
-#REPO: malakoct15-svg/AdamOCR
-#BRANCH: main
-#FILE: ocr_script.py
-#MSG: fix: clean up OCR script, support PaddleOCR v2 and v3, remove deprecated args
 import os
 from paddleocr import PaddleOCR
 
@@ -46,4 +41,3 @@ if os.path.exists(input_dir):
 with open(output_file, 'w', encoding='utf-8') as f:
     f.write('\n'.join(all_text))
 
-print("✅ OCR Process completed. Output saved to result.txt")
