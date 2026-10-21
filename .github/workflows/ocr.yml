@@ -6,6 +6,9 @@ on:
     paths:
       - 'input_images/**'
 
+permissions:
+  contents: write
+
 jobs:
   process_ocr:
     runs-on: ubuntu-latest
