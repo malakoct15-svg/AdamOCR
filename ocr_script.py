@@ -1,35 +1,46 @@
+#GH WRITE
+#REPO: malakoct15-svg/AdamOCR
+#BRANCH: main
+#FILE: ocr_script.py
+#MSG: fix: clean up OCR script, support PaddleOCR v2 and v3, remove deprecated args
 import os
 from paddleocr import PaddleOCR
 
-# إعداد PaddleOCR للغة العربية (متوافق مع الإصدارين 2 و 3)
-ocr = PaddleOCR(use_angle_cls=True, lang='ar')
+# إعداد PaddleOCR للغة العربية
+# تم إزالة show_log و use_angle_cls لأنها بترمي خطأ في النسخ الجديدة
+ocr = PaddleOCR(lang='ar')
 
 input_dir = 'input_images'
 output_file = 'result.txt'
-
 all_text = []
 
 if os.path.exists(input_dir):
-    # ترتيب الصور أبجدياً
+    # ترتيب الصور أبجدياً (عشان لو الصفحة 1 و 2)
     files = sorted(os.listdir(input_dir))
     for file in files:
         if file.lower().endswith(('.png', '.jpg', '.jpeg')):
             img_path = os.path.join(input_dir, file)
-            result = ocr.ocr(img_path)
             
-            # التحقق من النتيجة (سواء كانت إصدار قديم أو جديد)
-            if not result or result[0] is None:
-                continue
+            try:
+                result = ocr.ocr(img_path)
                 
-            # الإصدار القديم v2 (يرجع list of lists)
-            if isinstance(result[0], list):
-                for line in result[0]:
-                    all_text.append(line[1][0])
-            # الإصدار الجديد v3 (يرجع list of dicts)
-            elif isinstance(result[0], dict) and 'rec_texts' in result[0]:
-                all_text.extend(result[0]['rec_texts'])
-            elif hasattr(result[0], 'get') and 'rec_texts' in result[0]:
-                all_text.extend(result[0]['rec_texts'])
+                if not result or result[0] is None:
+                    continue
+                
+                # التعامل مع الإصدار الجديد v3 (بيرجع dict فيها rec_texts)
+                if isinstance(result[0], dict) or hasattr(result[0], 'get'):
+                    for res in result:
+                        if 'rec_texts' in res:
+                            all_text.extend(res['rec_texts'])
+                            
+                # التعامل مع الإصدار القديم v2 (بيرجع list of lists)
+                elif isinstance(result[0], list):
+                    for line in result[0]:
+                        if line and len(line) > 1:
+                            all_text.append(line[1][0])
+                            
+            except Exception as e:
+                print(f"Error processing {file}: {e}")
 
 # حفظ النتيجة في ملف نصي
 with open(output_file, 'w', encoding='utf-8') as f:
