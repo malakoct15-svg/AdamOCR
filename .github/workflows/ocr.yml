@@ -5,8 +5,11 @@ on:
     inputs:
       action_id:
         description: 'Unique ID to track this request'
-        required: true
+        required: false
         default: 'test'
+  push:
+    paths:
+      - 'input_images/**'
 
 jobs:
   process_ocr:
@@ -33,5 +36,5 @@ jobs:
           git config --global user.name "AdamOCR Bot"
           git config --global user.email "bot@adamocr.local"
           git add result.txt
-          git commit -m "Update OCR Results for ${{ github.event.inputs.action_id }}" || exit 0
+          git commit -m "Update OCR Results" || exit 0
           git push
