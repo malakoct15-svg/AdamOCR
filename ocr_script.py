@@ -41,3 +41,4 @@ if os.path.exists(input_dir):
 with open(output_file, 'w', encoding='utf-8') as f:
     f.write('\n'.join(all_text))
 
+print("✅ OCR Process completed. Output saved to result.txt")
